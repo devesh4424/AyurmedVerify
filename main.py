@@ -92,7 +92,7 @@ model=models.Sequential([
     layers.MaxPooling2D((2,2)),
     layers.Flatten(),
     tf.keras.layers.Dropout(0.5),
-    layers.Dense(512,activation='relu'),
+    layers.Dense(512,activation='tanh'),
     layers.Dense(n_classes,activation='softmax'),
 ])
 model.build(input_shape=input_shape)
