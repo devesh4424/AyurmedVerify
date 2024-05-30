@@ -80,20 +80,46 @@ n_classes=80
 model=models.Sequential([
     resize_and_rescale,
     data_augmentation,
-    layers.Conv2D(32,(3,3),activation='relu',input_shape=input_shape),
-    layers.MaxPooling2D((2,2)),
-    layers.Conv2D(64,(3,3),activation='relu',input_shape=input_shape),
-    layers.MaxPooling2D((2,2)),
-    layers.Conv2D(64,kernel_size=(3,3),activation='relu'),
-    layers.MaxPooling2D((2,2)),
-    layers.Conv2D(128,(3,3),activation='relu'),
-    layers.MaxPooling2D((2,2)),
-    layers.Conv2D(128,(3,3),activation='relu'),
-    layers.MaxPooling2D((2,2)),
-    layers.Flatten(),
-    tf.keras.layers.Dropout(0.5),
-    layers.Dense(512,activation='tanh'),
-    layers.Dense(n_classes,activation='softmax'),
+    # layers.Conv2D(32,(3,3),activation='relu',input_shape=input_shape),
+    # layers.MaxPooling2D((2,2)),
+    # layers.Conv2D(64,(3,3),activation='relu',input_shape=input_shape),
+    # layers.MaxPooling2D((2,2)),
+    # layers.Conv2D(64,kernel_size=(3,3),activation='relu'),
+    # layers.MaxPooling2D((2,2)),
+    # layers.Conv2D(128,(3,3),activation='relu'),
+    # layers.MaxPooling2D((2,2)),
+    # layers.Conv2D(128,(3,3),activation='relu'),
+    # layers.MaxPooling2D((2,2)),
+    # layers.Flatten(),
+    # tf.keras.layers.Dropout(0.5),
+    # layers.Dense(512,activation='tanh'),
+    # layers.Dense(n_classes,activation='softmax'),
+    Z1 = tf.keras.layers.Conv2D(8, (4, 4), strides=(1, 1), padding="same")(input_img)
+A1 = tf.keras.layers.ReLU()(Z1)
+P1 = tf.keras.layers.MaxPooling2D(pool_size=(8, 8), strides=(4, 4), padding="same")(A1)
+
+# Second convolutional layer
+Z2 = tf.keras.layers.Conv2D(filters=16,kernel_size=(2, 2), strides=(1, 1), padding="same")(P1)
+A2 = tf.keras.layers.ReLU()(Z2)
+P2 = tf.keras.layers.MaxPooling2D(pool_size=(4, 4), strides=(4, 4), padding="same")(A2)
+
+# Third convolutional layer
+Z3 = tf.keras.layers.Conv2D(32, (4, 4), strides=(1, 1), padding="same")(P2)
+A3 = tf.keras.layers.ReLU()(Z3)
+P3 = tf.keras.layers.MaxPooling2D(pool_size=(4, 4), strides=(4, 4), padding="valid")(A3)
+
+# Skip Connection Z1
+S1 = tf.keras.layers.Conv2D(16,kernel_size=(1,1),strides=(1,1),padding="same")(Z1)
+S1_pooled = tf.keras.layers.MaxPool2D(pool_size=(56,56), strides=(8,8),padding = "same")
+
+# Fourth convolutional layer
+Z4 = tf.keras.layers.Conv2D(filters=16,kernel_size=(2, 2), strides=(1, 1), padding="same")(S1)
+A4 = tf.keras.layers.ReLU()(Z4)
+P4 = tf.keras.layers.MaxPooling2D(pool_size=(4, 4), strides=(4, 4), padding="same")(A4)
+
+F = tf.keras.layers.Flatten()(P4)
+D1 = tf.keras.layers.Dense(units = 16, activation="tanh")(F)
+outputs = tf.keras.layers.Dense(units=3,activation="softmax")(D1)
 ])
 model.build(input_shape=input_shape)
 
